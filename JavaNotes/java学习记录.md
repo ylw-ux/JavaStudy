@@ -218,7 +218,7 @@ public class LISTSHOWTEST  {
 
 
 ## 封装
-private + 构造器 + get/set 方法
+private + 构造器 + get/set 方法（Alt + insert）
 
 这作为父类（超类） ，先记着
 ```java
@@ -241,7 +241,17 @@ public class LISTSHOW {
         this.age = age;  
     } //这是一个有参构造器  
   
-  //这些方法就是在别的类里可以调用private类的方法
+  
+  //自己写的方法
+	public void like(){  
+	    System.out.println("I like "+name+"His age is "+ age);  
+	}  
+	public void like2(String name,int age){  
+	    System.out.println("I like "+this.name+"His age is "+ this.age);  
+	}
+  
+  
+  //这些方法就是在别的类里可以调用private类的get/set方法
 	public String getName() {  
 	    return name;  
 	}  
@@ -278,7 +288,6 @@ public class LISTSHOWTEST  extends LISTSHOW{
 	        System.out.println(super.age);//10
         }
     }  
-  
 }
 ```
 继承的特性在我们创建子类的实例的时候才能体现
@@ -304,7 +313,7 @@ public class text {
 
 **_implements：在 Java 中，_implements_ 关键字用于让一个类实现接口，从而必须提供接口中声明的所有方法的具体实现。**
 
-**接口/抽象方法/方法重构**
+**接口/抽象方法/方法重写**
 
 ```java
 public interface ListImg {  
@@ -319,14 +328,160 @@ public interface ListImg {
 **abstract叫抽象方法：**
 比如交通工具作为父类，而自行车和高铁作为子类的话，自行车和高铁都具有驾驶的这个方法，但是他们两个的方法并不是一样的，方法的具体内容也是不一样的，一个是脚蹬的，一个是在轨道上面跑的。它们都具有方法驾驶，但是无法用同一个父类里的一个方法来共同表示，这种都具有相同概念，但又具体区分的叫做抽象方法。
 把抽象方法写在接口里，然后在我们的类中去调用它
-这就要用到**方法重构**
+这就要用到
+ 
+### 方法重写
 
-方法重构是为了什么，就是字面意识，新构建一个子类中的方法（和父类重名的方法),规定这个方法怎么做。以后通过实例调用方法就采用这个新的方法，当然方法重构只是一种思想，你也可以不这么做（就会采用父类中的原来的方法），我们这么做也只是为了实际编程需要来进行。
+**重写** 重写是面向对象编程中的概念，通常发生在**子类与父类**之间。子类保留父类方法的**方法名和参数列表**，但**重新实现方法内容**，以覆盖父类的行为。
+
+方法重写是为了什么，就是字面意识，新构建一个子类中的方法（和父类重名的方法),规定这个方法怎么做。以后通过实例调用方法就采用这个新的方法，当然方法重构只是一种思想，你也可以不这么做（就会采用父类中的原来的方法），我们这么做也只是为了实际编程需要来进行。
 
 ***是人使用语法，而不是语法使用人***
 
-![[Pasted image 20260531005759.png]]
-在载入我们的接口后，放在最后面，使用ALT+enter快捷方式重构方法（当然，你也可以自己敲）
-  ![[Pasted image 20260531010514.png]]
+I.  对于继承的方法重写
+Alt+insert
+![[Pasted image 20260605133833.png|161]]
+![[Pasted image 20260605134027.png|314]]
+这里测试的时候把父类里的name age改了
+
+
+
+II. 对于接口来所的方法重写
+
+方法重写对于接口来说是必须的，因为接口中只可以都是无返回值的抽象方法，所以在imp接口的类中必须重写方法
+![[Pasted image 20260531005759.png|579]]
+在载入我们的接口后，放在最后面，使用ALT+enter快捷方式重写方法（当然，你也可以自己敲）
+  ![[Pasted image 20260531010514.png|543]]
   
-  这里重构好了，具体写什么看实际情况
+  这里重写好了，具体写什么看实际情况
+
+
+## 多态
+
+在代码的维护中，会有多次迭代，而多态就是为了方便维护
+以父类或者接口作为实例可访问的类型 
+Parent p = new son();
+p.method();
+对于右边的子类具体是什么，不确定的，但是都会去使用同一个方法method
+父类或者接口只是一个空壳子，还是要在子类里重写方法
+
+```java
+//接口/(父类)
+public interface People {  
+    void eat();  
+    void drink();  
+}
+```
+
+```java
+//子类
+public class teacher implements People{  
+  
+    @Override  
+    public void eat() {  
+        System.out.println("eat meet");  
+    }  
+  
+    @Override  
+    public void drink() {  
+        System.out.println("drink milk");  
+    }  
+}
+```
+
+```java
+//方法类
+public class live  {  
+    public void live(People people){  
+        people.eat();  
+        people.drink();  
+    }  
+  
+}
+```
+
+```java
+//实现类
+public class text {  
+    static void main() {
+	    //用方法类的写法  
+        live live = new live();  
+        People p1 = new teacher();  
+        live.live(new teacher()); 
+        People p1 = new teacher();
+        
+        
+        //不用方法类的写法
+        p1.eat();
+        p1.drink(); 
+  
+    }  
+}
+```
+
+
+## 匿名内部类与Lambda表达式
+
+匿名内部类就是把实现接口实例和额外创建一个类文件和重写方法放在一块了
+Lambda表达式就是匿名内部类只用重写一个方法时的简写形式
+
+**匿名内部类 = 没有名字的临时一次性类**
+
+- 它是一个**局部类**，只能用一次，用完就丢；
+- 必须**继承一个父类** 或 **实现一个接口**；
+- 作用：**简化代码**，不用单独写一个类文件 / 类定义。
+
+例子：普通写法
+一个接口
+```java
+public interface cloth {  
+    void dress();  
+}
+```
+
+要创建一个类
+```java
+class dress implements cloth { 
+@Override 
+public void dress() { 
+	System.out.println("I like dress"); 
+	} 
+}
+
+```
+
+实现时
+```java
+public class text {  
+    static void main() {  
+        cloth d = new dress();
+    }  
+}
+
+```
+
+**匿名内部类
+```java
+public class text {  
+    static void main() {  
+        cloth d = new cloth(){ //这里
+	        @Override 
+			public void dress() { 
+				System.out.println("I like dress"); 
+			} 
+        };
+        d.dress();
+    }  
+}
+
+```
+Lambda表达式
+Lambda 只认「单方法接口」，别的一概不认！
+```java
+public class text {  
+    static void main() {  
+        cloth d = ()-> System.out.println("I like dress"); //这里 
+        d.dress();
+    }  
+}
+```
