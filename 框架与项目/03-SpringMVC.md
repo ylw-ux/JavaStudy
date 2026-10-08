@@ -64,17 +64,20 @@ Tip-- 一定是static文件夹下放静态资源，否则spring不会自动解�
 
 其实对于 `resources/static` 目录下的静态 HTML，Spring Boot 默认已经把它们映射为根路径了。  
 你完全不需要通过 `/save` 接口来展示页面，直接访问 `http://localhost:8081/test.html` 就能看到表单了。
+
 ```java
   
 @Controller  
 //指定当前类是springmvc的控制器bean  
 public class TestController {  
     @RequestMapping("/save")  
-    public String  save(HttpServletRequest req){  
-        //获取请求行里的信息   数据是由发起者（浏览器）  
-        //1.获取请求方式  
-        String method = req.getMethod();  
-        System.out.println("获取请求方式："+method);  
+    public String  save(@RequestParam("req1")String reequest1,
+					     HttpServletRequest req){  
+	    //获取请求行里的信息   数据是由发起者（浏览器）  
+	    //1.获取请求方式  
+	    String method = req.getMethod();  
+	    System.out.println("获取请求方式："+method);  
+	    System.out.println("request="+ reequest1);
         //3.获取URL(统一资源定位符):请求的网址，不是发起的页面。  
         //http://localhost:81/webservlet/requestdemo1  
         StringBuffer requestURL = req.getRequestURL();  
@@ -90,15 +93,34 @@ public class TestController {
         System.out.println(agent);  
         return "test.html";  //这就没有设置responsebody 会根据这个去查找对应的静态资源
     }  
+    //接受响应参数
     @RequestMapping("/post")  
     @ResponseBody  
-    public String postTest(String username,String password){  
+    public String postTest(String username,String password){    
+    //String username,String password和表单的name="username"name="password"或者url?带的key要对应
+    //这里也可以重命名了，只不过RequestParam里面要和前端的表单或json数据对应
         System.out.println("username = " + username);  
         System.out.println("password = " + password);  
         System.out.println("xxxx");  
         return "success";  //Success会返回给前端
     }
 ```
+
+`@RequestParam("req1")String reequest1,`对请求的数据进行重命名，这里req1为请求的携带参数名对应，request1为局部变量
+
+```
+运行：http://localhost:8081/save?req1=114514
+
+后端结果：
+获取请求方式：GET
+request=114514
+获取URL(统一资源定位符):http://localhost:8081/save
+获取URI(统一资源标识符):/save
+请求头Accept-Encoding=gzip, deflate, br, zstd
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36
+```
+
+
 test.html
 ```html
 <html lang="en">  

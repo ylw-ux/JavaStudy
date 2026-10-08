@@ -360,6 +360,7 @@ Host: localhost:8080
 User-Agent: curl/8.0
 Accept: */*
 ```
+?name=zhangsan&age=18就是GET请求的特点，请求参数挂在url后面
 
 - 请求行：`GET /user/save?name=zhangsan&age=18 HTTP/1.1`
 - 请求头：`Host`、`User-Agent`、`Accept`
@@ -381,7 +382,7 @@ Host: localhost:8080
 Content-Type: application/x-www-form-urlencoded
 Content-Length: 21
 
-name=zhangsan&age=18
+name=zhangsan&age=18     <--这一坨就是请求体
 ```
 
 POST JSON：
