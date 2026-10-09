@@ -106,7 +106,14 @@ public class TestController {
     }
 ```
 
-`@RequestParam("req1")String reequest1,`对请求的数据进行重命名，这里req1为请求的携带参数名对应，request1为局部变量
+
+
+- @RequestParam("req1")String reequest1,对请求的数据进行重命名，
+	这里req1为请求的携带参数名对应，request1为局部变量
+- @RequestParam(values="请求参数名称"
+	,required = false（可以请求不传这个参数）,
+	defaultValue="当前参数的默认值")
+
 
 ```
 运行：http://localhost:8081/save?req1=114514
@@ -166,3 +173,48 @@ AJAX 一样有：
 ![[Pasted image 20261008222124.png|720]]
 
 ## axios：对 AJAX 的封装
+[中文文档](https://www.axios-http.cn/)
+
+有基础写法，但为了方便起见， Axios 已经为所有支持的请求方法提供了别名。如下：
+- `get` 请求 ： `axios.get(url[,config])`
+- `delete` 请求 ： `axios.delete(url[,config])`
+- `head` 请求 ： `axios.head(url[,config])`
+- `options` 请求 ： `axios.option(url[,config])`
+- `post` 请求：`axios.post(url[,data[,config])`
+- `put` 请求：`axios.put(url[,data[,config])`
+- `patch` 请求：`axios.patch(url[,data[,config])`
+```html
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+    <meta charset="UTF-8">  
+    <title>Title</title>  
+    <script src="js/axios-0.18.0.js"></script>  
+</head>  
+<body>  
+  
+<script> 
+    // 基础写法  
+    // get  
+    axios({  
+        method:"get",  
+        url:"http://localhost:8081/save?req1=hello"  
+    }).then(res=>{  
+        console.log(res.data) //控制台打印日志 
+    }) 
+    //post  
+    axios({  
+        method:"post",  
+        url:"http://localhost:8081/post",  
+        data:"username=admin"  
+    }).then(res=>{  
+        console.log(res.data)  
+    })
+    //简略写法 
+    axios.post("http://localhost:8081/post","username=hello&password=123456").then(resq=>{console.log(resq.data)})  
+    axios.get("http://localhost:8081/save?req1=hello").then(resq=>{console.log(resq.data)})  
+</script>  
+  
+</body>  
+</html>
+```
