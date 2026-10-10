@@ -70,7 +70,7 @@ Tip-- 一定是static文件夹下放静态资源，否则spring不会自动解�
 @Controller  
 //指定当前类是springmvc的控制器bean  
 public class TestController {  
-    @RequestMapping("/save")  
+    @RequestMapping("/get")  
     public String  save(@RequestParam("req1")String reequest1,
 					     HttpServletRequest req){  
 	    //获取请求行里的信息   数据是由发起者（浏览器）  
@@ -183,6 +183,7 @@ AJAX 一样有：
 - `post` 请求：`axios.post(url[,data[,config])`
 - `put` 请求：`axios.put(url[,data[,config])`
 - `patch` 请求：`axios.patch(url[,data[,config])`
+### get和post
 ```html
 <!DOCTYPE html>  
 <html lang="en">  
@@ -212,9 +213,116 @@ AJAX 一样有：
     })
     //简略写法 
     axios.post("http://localhost:8081/post","username=hello&password=123456").then(resq=>{console.log(resq.data)})  
-    axios.get("http://localhost:8081/save?req1=hello").then(resq=>{console.log(resq.data)})  
+    axios.get("http://localhost:8081/save?req1=hello").then(resq=>{console.log(resq.data)})
+    //resq是请求结果的包装，这里resq和res写法都可以  
 </script>  
   
 </body>  
 </html>
 ```
+
+对于get和post请求，前端可以发送许多类型的数据，后端对应也有各种数据结构来接收（java为例）
+- 8基本数据和1引用数据（String）类型
+- pojo实体类
+- 嵌套pojo
+- 数组
+- 集合
+代码：
+```java 
+@Data  
+@AllArgsConstructor  
+@NoArgsConstructor  
+public class User {  
+    private Integer id;  
+    private String username;  
+    private String password;  
+    private String gender;  
+    private String addr;  
+}
+@Data  
+@AllArgsConstructor  
+@NoArgsConstructor  
+public class Userpra1 {  
+    private Integer id;  
+    private String username;  
+    private String password;  
+    private String phone;  
+    private Integer age;  
+    private Integer status;  
+    private Date createTime;  
+    public UserCardpra userCardpra;  
+}
+```
+
+
+```java
+@ResponseBody  
+//加@ResponseBody不然返回String报错
+public class TestController {
+	//数组接  
+    @RequestMapping("/list")  
+    public String mylist(int [] list){  
+        for(int a:list){  
+            System.out.println("a = " + a);  
+        }  
+        return "list";  
+    }  
+    //pojo接  
+    @RequestMapping("/pojo")  
+    public String pojo(User user){  
+        System.out.println("user = " + user);  
+        return "pojouser"+user;  
+    }  
+    //pojo嵌套接  
+    @RequestMapping("/pojos")  
+    public String pojos(Userpra1 user){  
+        System.out.println("user = " + user);  
+        return "pojos"+user;  
+    }  
+  
+    //json数组 ["1","2","3"] ====> list集合 一般Post请求  
+    //@RequestBody 表示接收的是前端的json相关请求  
+    @RequestMapping("/jsonArray")  
+    public String jsonArray(@RequestBody List<String> list){  
+        for (String s:list){  
+            System.out.println("s = " + s);  
+        }  
+        return "jsonArray";  
+    }  
+    //json对象{ id:1,name:"lihua"  }  ====> pojo  
+    @RequestMapping("/jsonpojo")  
+    public String jsonpojo(@RequestBody User user){  
+        System.out.println("user = " + user);  
+        return ""+user;  
+    }  
+	//json对象的数组   ====> 集合  
+	//    [{  
+	//        id:1,  
+	//        name:"hello"  
+	//    },  
+	//    {  
+	//        id:2,  
+	//        name:"world"  
+	//    }]  
+    @RequestMapping("/jsonarr")  
+    public String jsonarr(@RequestBody List<String> list1){  
+        for (String s:list1){  
+            System.out.println("s = " + s);  
+        }  
+        return "jsonarr";  
+    }  
+  
+    //Date类型  
+    @RequestMapping("/Date")  
+    public String MYDate(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss" )@RequestParam(value = "time1") LocalDateTime t1,  
+                            @DateTimeFormat(pattern = "yyyy/MM/dd" )LocalDate t2){  
+        System.out.println("t1 = " + t1);  
+        System.out.println("t2 = " + t2);  
+        return "datetime";  
+    }
+```
+Tips：前端请求参数名要和后端的形参对应，不然出错
+### 重要辨别：
+@RequestBody和@RequestParam不是和post和get对应，而是和前端发送的数据类型对应
+[[03b-@RequestParam@RequestBody]]
+
