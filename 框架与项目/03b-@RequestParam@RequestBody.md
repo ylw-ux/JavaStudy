@@ -34,11 +34,11 @@
 
 SpringMVC 对应三个注解：
 
-| 数据位置 | 注解 |
-|---|---|
-| URL 查询参数 / 表单参数 | `@RequestParam` |
-| 请求体 JSON | `@RequestBody` |
-| 路径变量 | `@PathVariable` |
+| 数据位置            | 注解              | eg                             |
+| --------------- | --------------- | ------------------------------ |
+| URL 查询参数 / 表单参数 | `@RequestParam` | http://bilbili?user=123&id=456 |
+| 请求体 JSON        | `@RequestBody`  | 前端一段json{id=1,name="user"}     |
+| 路径变量            | `@PathVariable` | http://baidu/login/1           |
 
 ---
 

@@ -254,10 +254,15 @@ public class Userpra1 {
 }
 ```
 
+**@ResponseBody** 是一个用于 Spring MVC 框架中的注解，主要用于将控制器方法的返回值直接写入 HTTP 响应体中，而不是将其解析为视图路径。这个注解通常用于异步获取数据的场景，例如通过 AJAX 请求获取 JSON 或 XML 数据。
+
+主要作用
+1. **直接返回数据**：当方法上使用 @ResponseBody 注解时，返回值会直接写入到 HTTP 响应体中，而不会被解析为跳转路径。例如，当返回一个字符串时，这个字符串会直接作为响应体返回给客户端。
+2. **支持多种数据格式**：@ResponseBody 可以将 Java 对象转换为 JSON 或 XML 格式的数据，并写入到响应体中。这是通过适当的 HttpMessageConverter 实现的。
+3. **避免视图解析**：使用 @ResponseBody 注解后，返回结果不会再经过视图解析器，而是直接写入到输入流中，相当于通过 response 对象输出指定格式的数据。
 
 ```java
 @ResponseBody  
-//加@ResponseBody不然返回String报错
 public class TestController {
 	//数组接  
     @RequestMapping("/list")  
@@ -281,7 +286,7 @@ public class TestController {
     }  
   
     //json数组 ["1","2","3"] ====> list集合 一般Post请求  
-    //@RequestBody 表示接收的是前端的json相关请求  
+    //@RequestBody 表示接收的是前端的json相关请求
     @RequestMapping("/jsonArray")  
     public String jsonArray(@RequestBody List<String> list){  
         for (String s:list){  
@@ -326,3 +331,68 @@ Tips：前端请求参数名要和后端的形参对应，不然出错
 @RequestBody和@RequestParam不是和post和get对应，而是和前端发送的数据类型对应
 [[03b-@RequestParam@RequestBody]]
 
+# REST风格编程
+之前学的普通 Controller 写法，一个功能一个 URL，比如 `/user/save`、`/user/delete`、`/user/getById`。RESTful 的核心思想是：**用 URL 定位资源，用 HTTP 方法表达操作。**
+使用 `路径变量`、`@PathVariable` 来设计请求路径和区分，而不是？挂在url后面，比较安全，设计清晰。
+
+@RestController = @ResponseBody + @Controller
+区分3者区别
+- **`@Controller`**：默认返回视图（页面）。
+- **`@ResponseBody`**：强制返回数据（JSON）。
+- **`@RestController`**：**组合拳**。用于**专门写纯 API 接口**的类（前后端分离），省去在每个方法上写 `@ResponseBody` 的麻烦。
+
+RestController
+  ```java
+@RestController  
+@RequestMapping("/order")  
+public class REESTcontroller2 {  
+    //    具体分get还是post  
+    @GetMapping("/{id}")//http://localhost/order/1查询指定用户信息GET（查询）  
+    //@PathVariable绑定路径参数和方法形参的关系  
+    public String getById(@PathVariable int id) {  
+        System.out.println("id = " + id);  
+        return "根据id查询";  
+    }  
+    //@PostMapping  
+    //@DeleteMapping    //添加  
+    @PostMapping  
+    public String add(){  
+        System.out.println("user add....");  
+        return "{'modules':'user add'}";  
+    }  
+    //删除  
+    @DeleteMapping("/{id}")  
+    public String delete(@PathVariable Integer id){  
+        System.out.println("user delete..." + id);  
+        return "{'modules':'user delete'}";  
+    }  
+    //修改  
+    @PutMapping  
+    public String update(@RequestBody User user){  
+        System.out.println(user);  
+        return "{'modules':'user update'}";  
+    }  
+    //查询所有  
+    @GetMapping  
+    public String selectAll(){  
+        System.out.println("users selectAll");  
+        return "{'modules':'users selectAll'}";  
+    }  
+    //根据id查询  
+    @GetMapping("/{id}")  
+    public String selectById(@PathVariable Integer id){  
+        System.out.println("user:" + id);  
+        return "{'modules':'user getById'}";  
+    }  
+  
+}
+  ```
+
+
+# Springboot实现热部署
+```xml
+<dependency><!--热部署 ctrl++f9-->    
+	<groupId>org.springframework.boot</groupId>  
+    <artifactId>spring-boot-devtools</artifactId>  
+</dependency>
+```
