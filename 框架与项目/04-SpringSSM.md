@@ -133,9 +133,60 @@ public class session {
 
 查询所有
 pageinfo 多表查询 要加依赖
+# 分页助手插件
+**业务 SQL 还是得你自己写**。PageHelper 不是"自动生成 SQL"的工具，它是 MyBatis 的一个**拦截器插件**——它只做两件事：
+1. **改写你写的 SQL**：在你执行查询前，自动在 SQL 末尾追加 `LIMIT ?, ?`
+2. **自动生成 COUNT SQL**：根据你写的查询语句，自动推导出 `SELECT COUNT(*) FROM (...)` 来统计总数
 
+所以分工是：**你负责"查什么"，PageHelper 负责"分页 + 计数"**。
+```xml
+<!-- PageHelper 分页 -->
+<dependency>  
+    <groupId>com.github.pagehelper</groupId>  
+    <artifactId>pagehelper-spring-boot-starter</artifactId>  
+    <version>1.4.7</version>  
+    <exclusions>
+            <exclusion>  
+	            <groupId>org.mybatis.spring.boot</groupId>  
+	            <artifactId>mybatis-spring-boot-starter</artifactId>  
+	        </exclusion>
+	</exclusions>
+</dependency>
+```
+controller里的pagehelper里有springbootwebstarter依赖和传递，可能和下层传递过来的springbootwebstarter冲突，可以排除出去
+```yml
+# application.yml
+pagehelper:
+  # 指定数据库方言 MYSQL
+  helper-dialect: mysql
+  # 合理化分页：页码<=1查第一页，页数超总数查最后一页
+  reasonable: true
+  # 支持接口参数分页
+  support-methods-arguments: true
+  # 默认分页参数名
+  params: pageNum=pageNum;pageSize=pageSize
+```
 
-Code类
+```java
+@RestController  
+@RequestMapping("course")  
+public class CourseController {  
+  
+    @Autowired  
+    private Serviceimpl serviceimpl;  
+    @RequestMapping("listNotSelectedCourse")  
+    public PageInfo<Course> listNotSelectedCourse(@RequestParam(defaultValue = "1") int pageNum,  
+                                                  @RequestParam(defaultValue = "5") int pageSize){  
+        // 1. 开启分页（必须紧邻下一行查询）  
+        PageHelper.startPage(pageNum,pageSize);  
+        // 2. mapper最后直接用全部查询就好 select * from ，分页助手自动拼接limit  
+        List<Course> courses = serviceimpl.listNotSelectedCourse();  
+        // 3. 用 PageInfo 包装，获取分页元数据  
+        return new PageInfo<>(courses);  
+    }  
+}
+```
+Code类 
 Result类--- code data msg
 统一结果集--状态码Integer code 数据Object data 信息 String msg
 # 统一结果集
@@ -153,13 +204,14 @@ public class User {
     private String name;
 }
  ```
+# res对象
 ```json
-res对象 ( 前端res接收的response结果)= {
+res对象 /* 前端res接收的response结果) */= {
     status: 200,           // HTTP 状态码
     statusText: "OK",      // 状态描述
     headers: {...},        // 【纠正】响应头 (拼写是 headers)
     config: {...},         // 请求配置 (baseURL, method 等)
-	data( res.data) (对应后端return的统一结果集 Result类，axios框架处理的固定格式，代表http响应体) ={
+	data/* res.data) (对应后端return的统一结果集 Result类，axios框架处理的固定格式，代表http响应体) */ ={
 		code/*Result里的code变量*/=
 		msg/*msg变量*/=
 		data /*泛型T->User 类*/= { // 前端怎么写，完全看后端 `Result` 类里的属性名。
